@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /**
  * TenantOnboardingServiceImpl
  *
@@ -40,12 +39,11 @@ public class TenantOnboardingServiceImpl implements TenantOnboardingService {
 	/* Encrypts admin passwords */
 	private final PasswordEncoder passwordEncoder;
 
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	@Transactional
+	@Transactional("masterTransactionManager")
 	public void onboardTenant(TenantRegisterRequestDto request) {
 		// Build tenant creation request
 		TenantRequestDto tenantRequest = TenantRequestDto.builder()

@@ -1,7 +1,7 @@
 package com.multitenant.app.master.service.impl;
 
 import com.multitenant.app.master.service.TenantPhysicalDbService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
  * database provisioning.
  */
 @Service
-@RequiredArgsConstructor
 public class TenantPhysicalDbServiceImpl implements TenantPhysicalDbService {
 
 	/* Executes low-level database creation commands */
 	private final JdbcTemplate jdbcTemplate;
+
+	public TenantPhysicalDbServiceImpl(@Qualifier("masterJdbcTemplate") JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	/**
 	 * {@inheritDoc}
