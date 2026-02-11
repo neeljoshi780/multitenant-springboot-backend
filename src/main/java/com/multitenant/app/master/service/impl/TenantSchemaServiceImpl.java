@@ -1,7 +1,8 @@
 package com.multitenant.app.master.service.impl;
 
+import com.multitenant.app.context.TenantContext;
 import com.multitenant.app.master.service.TenantSchemaService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,22 +13,26 @@ import org.springframework.stereotype.Service;
  * database schema initialization.
  */
 @Service
-@RequiredArgsConstructor
 public class TenantSchemaServiceImpl implements TenantSchemaService {
 
-	/* Executes schema creation SQL commands */
+	/* Executes low-level database creation commands */
 	private final JdbcTemplate jdbcTemplate;
+
+	public TenantSchemaServiceImpl(@Qualifier("tenantJdbcTemplate") JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void createTenantSchema(String databaseName) {
-		// Switch to tenant database
-		jdbcTemplate.execute("USE " + databaseName);
+		try {
+			// Set tenant context to switch routing
+			TenantContext.setTenantDb(databaseName);
 
-		// Create users table
-		jdbcTemplate.execute("""
+			// Create users table
+			jdbcTemplate.execute("""
 			CREATE TABLE IF NOT EXISTS users (
 				id BIGINT PRIMARY KEY AUTO_INCREMENT,
 				email VARCHAR(150) UNIQUE NOT NULL,
@@ -40,8 +45,8 @@ public class TenantSchemaServiceImpl implements TenantSchemaService {
 			)
 		""");
 
-		// Create customers table
-		jdbcTemplate.execute("""
+			// Create customers table
+			jdbcTemplate.execute("""
 			CREATE TABLE IF NOT EXISTS customers (
 				id BIGINT AUTO_INCREMENT PRIMARY KEY,
 				first_name VARCHAR(50) NOT NULL,
@@ -57,6 +62,10 @@ public class TenantSchemaServiceImpl implements TenantSchemaService {
 				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 			)
 		""");
+		} finally {
+			// Clear tenant context to avoid data contamination
+			TenantContext.clear();
+		}
 	}
 
 }

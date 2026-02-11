@@ -57,11 +57,11 @@ public class CustomerRequestDto {
 	private String email;
 
 	@NotBlank(message = "Address line 1 is required.")
-	@Pattern(regexp = "^[A-Za-z0-9,.\\-/#]+( [A-Za-z0-9,.\\-/#]+)*$", message = "Address line 1 contains invalid characters.")
+	@Pattern(regexp = "^[A-Za-z0-9,.\\-/#@\\s\\r\\n]+$", message = "Address line 1 contains invalid characters.")
 	@Size(max = 255, message = "Address line 1 must not exceed 255 characters.")
 	private String address1;
 
-	@Pattern(regexp = "^$|^[A-Za-z0-9,.\\-/#]+( [A-Za-z0-9,.\\-/#]+)*$", message = "Address line 2 contains invalid characters.")
+	@Pattern(regexp = "^[A-Za-z0-9,.\\-/#@\\s\\r\\n]+$", message = "Address line 2 contains invalid characters.")
 	@Size(max = 255, message = "Address line 2 must not exceed 255 characters.")
 	private String address2;
 

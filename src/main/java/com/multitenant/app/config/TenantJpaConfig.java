@@ -24,11 +24,7 @@ import javax.sql.DataSource;
  * use tenant database by default instead of master database.
  */
 @Configuration
-@EnableJpaRepositories(
-	basePackages = "com.multitenant.app.tenant.repository",
-	entityManagerFactoryRef = "tenantEntityManagerFactory",
-	transactionManagerRef = "tenantTransactionManager"
-)
+@EnableJpaRepositories(basePackages = "com.multitenant.app.tenant.repository", entityManagerFactoryRef = "tenantEntityManagerFactory", transactionManagerRef = "tenantTransactionManager")
 public class TenantJpaConfig {
 
 	/**
@@ -40,8 +36,8 @@ public class TenantJpaConfig {
 	@Primary
 	@Bean(name = "tenantEntityManagerFactory")
 	public LocalContainerEntityManagerFactoryBean tenantEntityManagerFactory(
-		EntityManagerFactoryBuilder builder,
-		@Qualifier("tenantRoutingDataSource") DataSource dataSource) {
+			EntityManagerFactoryBuilder builder,
+			@Qualifier("tenantRoutingDataSource") DataSource dataSource) {
 
 		return builder
 			.dataSource(dataSource)
@@ -59,6 +55,14 @@ public class TenantJpaConfig {
 	@Bean(name = "tenantTransactionManager")
 	public JpaTransactionManager tenantTransactionManager(@Qualifier("tenantEntityManagerFactory") EntityManagerFactory emf) {
 		return new JpaTransactionManager(emf);
+	}
+
+	/**
+	 * Creates JdbcTemplate for tenant database operations.
+	 */
+	@Bean(name = "tenantJdbcTemplate")
+	public org.springframework.jdbc.core.JdbcTemplate tenantJdbcTemplate(@Qualifier("tenantRoutingDataSource") DataSource dataSource) {
+		return new org.springframework.jdbc.core.JdbcTemplate(dataSource);
 	}
 
 }
